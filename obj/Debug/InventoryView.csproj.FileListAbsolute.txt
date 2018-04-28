@@ -1,9 +1,0 @@
-C:\Projects\InventoryView\InventoryView\obj\Debug\InventoryView.csprojResolveAssemblyReference.cache
-C:\Projects\InventoryView\InventoryView\obj\Debug\InventoryView.csproj.CoreCompileInputs.cache
-C:\Projects\InventoryView\InventoryView\bin\Debug\InventoryView.dll
-C:\Projects\InventoryView\InventoryView\bin\Debug\InventoryView.pdb
-C:\Projects\InventoryView\InventoryView\bin\Debug\Interfaces.dll
-C:\Projects\InventoryView\InventoryView\obj\Debug\InventoryView.dll
-C:\Projects\InventoryView\InventoryView\obj\Debug\InventoryView.pdb
-C:\Projects\InventoryView\InventoryView\obj\Debug\InventoryView.InventoryViewForm.resources
-C:\Projects\InventoryView\InventoryView\obj\Debug\InventoryView.csproj.GenerateResource.Cache
