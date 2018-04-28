@@ -40,6 +40,7 @@
             this.btnFindNext = new System.Windows.Forms.Button();
             this.btnFindPrev = new System.Windows.Forms.Button();
             this.btnScan = new System.Windows.Forms.Button();
+            this.btnReload = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // tv
@@ -90,7 +91,7 @@
             // 
             // btnExpand
             // 
-            this.btnExpand.Location = new System.Drawing.Point(713, 5);
+            this.btnExpand.Location = new System.Drawing.Point(676, 5);
             this.btnExpand.Name = "btnExpand";
             this.btnExpand.Size = new System.Drawing.Size(75, 23);
             this.btnExpand.TabIndex = 6;
@@ -100,7 +101,7 @@
             // 
             // btnCollapse
             // 
-            this.btnCollapse.Location = new System.Drawing.Point(713, 27);
+            this.btnCollapse.Location = new System.Drawing.Point(676, 27);
             this.btnCollapse.Name = "btnCollapse";
             this.btnCollapse.Size = new System.Drawing.Size(75, 23);
             this.btnCollapse.TabIndex = 7;
@@ -110,7 +111,7 @@
             // 
             // btnWiki
             // 
-            this.btnWiki.Location = new System.Drawing.Point(808, 16);
+            this.btnWiki.Location = new System.Drawing.Point(757, 16);
             this.btnWiki.Name = "btnWiki";
             this.btnWiki.Size = new System.Drawing.Size(75, 23);
             this.btnWiki.TabIndex = 8;
@@ -153,7 +154,7 @@
             // 
             // btnScan
             // 
-            this.btnScan.Location = new System.Drawing.Point(889, 16);
+            this.btnScan.Location = new System.Drawing.Point(838, 16);
             this.btnScan.Name = "btnScan";
             this.btnScan.Size = new System.Drawing.Size(97, 23);
             this.btnScan.TabIndex = 11;
@@ -161,11 +162,22 @@
             this.btnScan.UseVisualStyleBackColor = true;
             this.btnScan.Click += new System.EventHandler(this.btnScan_Click);
             // 
+            // btnReload
+            // 
+            this.btnReload.Location = new System.Drawing.Point(941, 16);
+            this.btnReload.Name = "btnReload";
+            this.btnReload.Size = new System.Drawing.Size(97, 23);
+            this.btnReload.TabIndex = 12;
+            this.btnReload.Text = "Reload File";
+            this.btnReload.UseVisualStyleBackColor = true;
+            this.btnReload.Click += new System.EventHandler(this.btnReload_Click);
+            // 
             // InventoryViewForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1057, 471);
+            this.Controls.Add(this.btnReload);
             this.Controls.Add(this.btnScan);
             this.Controls.Add(this.btnFindNext);
             this.Controls.Add(this.btnFindPrev);
@@ -200,5 +212,6 @@
         private System.Windows.Forms.Button btnFindNext;
         private System.Windows.Forms.Button btnFindPrev;
         private System.Windows.Forms.Button btnScan;
+        private System.Windows.Forms.Button btnReload;
     }
 }

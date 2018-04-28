@@ -221,6 +221,13 @@ namespace InventoryView
                         ScanMode = null;
                         SaveSettings();
                     }
+                    else if (trimtext == "You shouldn't do that while inside of a home.  Step outside if you need to check something.")
+                    {
+                        _host.EchoText("You cannot check the contents of your home while inside of a home. Step outside and try again.");
+                        _host.EchoText("Scan Complete.");
+                        ScanMode = null;
+                        SaveSettings();
+                    }
                 } //end if HomeStart
                 else if (ScanMode == "Home")
                 {
@@ -248,7 +255,7 @@ namespace InventoryView
 
         public string ParseInput(string text)
         {
-            if (text.ToLower().StartsWith("/inventoryview"))
+            if (text.ToLower().StartsWith("/inventoryview") || text.ToLower().StartsWith("/iv"))
             {
                 var SplitText = text.Split(' ');
                 if (SplitText.Length == 1 || SplitText[1].ToLower() == "help")

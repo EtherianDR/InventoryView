@@ -163,5 +163,12 @@ namespace InventoryView
             Class1._host.SendText("/InventoryView scan");
             this.Close();
         }
+
+        private void btnReload_Click(object sender, EventArgs e)
+        {
+            Class1.LoadSettings();
+            Class1._host.EchoText("Inventory reloaded.");
+            this.Close();
+        }
     }
 }
