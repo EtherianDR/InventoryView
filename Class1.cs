@@ -218,6 +218,7 @@ namespace InventoryView
                     {
                         _host.EchoText("Skipping Home.");
                         _host.EchoText("Scan Complete.");
+                        _host.SendText("#parse InventoryView scan complete");
                         ScanMode = null;
                         SaveSettings();
                     }
@@ -225,6 +226,7 @@ namespace InventoryView
                     {
                         _host.EchoText("You cannot check the contents of your home while inside of a home. Step outside and try again.");
                         _host.EchoText("Scan Complete.");
+                        _host.SendText("#parse InventoryView scan complete");
                         ScanMode = null;
                         SaveSettings();
                     }
@@ -234,6 +236,7 @@ namespace InventoryView
                     if (trimtext == ">") // There is no text after the home list, so watch for the next >
                     {
                         _host.EchoText("Scan Complete.");
+                        _host.SendText("#parse InventoryView scan complete");
                         ScanMode = null;
                         SaveSettings();
                     }
@@ -333,7 +336,7 @@ namespace InventoryView
 
         public string Version
         {
-            get { return "1.3"; }
+            get { return "1.0"; }
         }
 
         public string Description
