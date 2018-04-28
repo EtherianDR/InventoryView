@@ -194,7 +194,7 @@ namespace InventoryView
                         }
                         else
                         {
-                            for (int i = newlevel; i < level; i++)
+                            for (int i = newlevel; i <= level; i++)
                             {
                                 lastItem = lastItem.parent;
                             }
