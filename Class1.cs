@@ -13,27 +13,39 @@ namespace InventoryView
 {
     public class Class1 : GeniePlugin.Interfaces.IPlugin
     {
-
+        // Genie host.
         public static IHost _host;
 
+        // Plugin Form
         private Form _form;
 
+        // This contains all the of the inventory data.
         public static List<CharacterData> characterData = new List<CharacterData>();
 
+        // Path to Genie config.
         private static string basePath = Application.StartupPath;
 
+        // Whether or not InventoryView is currently scanning data, and what state it is in.
         private string ScanMode = null;
+
+        // Keeps track of how many containers deep you are when scanning inventory in containers.
         private int level = 1;
+
+        // The current character & source being scanned.
         private CharacterData currentData = null;
+
+        // The last item tha was scanned.
         private ItemData lastItem = null;
 
         public void Initialize(IHost host)
         {
             _host = host;
 
+            // Figure out if we are using the config in %appdata% or in the Genie directory.
             if (!Directory.Exists(Path.Combine(basePath, "Config")))
                 basePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), Application.ProductName);
 
+            // Load inventory from the XML config if available.
             LoadSettings();
         }
 
@@ -52,13 +64,13 @@ namespace InventoryView
 
         public string ParseText(string text, string window)
         {
-            if (ScanMode != null)
+            if (ScanMode != null) // If a scan isn't in progress, do nothing here.
             {
-                string trimtext = text.Trim(new char[] { '\n', '\r', ' ' });
-                if (string.IsNullOrEmpty(trimtext)) { }
-                else if (ScanMode == "Start")
+                string trimtext = text.Trim(new char[] { '\n', '\r', ' ' }); // Trims spaces and newlines.
+                if (string.IsNullOrEmpty(trimtext)) { } // Skip blank lines
+                else if (ScanMode == "Start") // When a scan is initiated, it starts here.
                 {
-                    if (trimtext == "You have:")
+                    if (trimtext == "You have:") // Text that appears at the beginning of "inventory list"
                     {
                         _host.EchoText("Scanning Inventory.");
                         ScanMode = "Inventory";
@@ -69,8 +81,9 @@ namespace InventoryView
                 } //end if Start
                 else if (ScanMode == "Inventory")
                 {
-                    if (text.StartsWith("Roundtime:"))
+                    if (text.StartsWith("Roundtime:")) // text that appears at the end of "inventory list"
                     {
+                        // Inventory List has a RT based on the number of items, so grab the number and pause the thread for that length.
                         Match match = Regex.Match(trimtext, @"^Roundtime:\s{1,3}(\d{1,3})\s{1,3}secs?$");
                         ScanMode = "VaultStart";
                         _host.EchoText(string.Format("Pausing {0} seconds for RT.", int.Parse(match.Groups[1].Value)));
@@ -79,23 +92,28 @@ namespace InventoryView
                     }
                     else
                     {
+                        // The first level of inventory has a padding of 2 spaces to the left, and each level adds an additional 3 spaces.
+                        // 2, 5, 8, 11, 14, etc..
                         int spaces = text.Length - text.TrimStart().Length;
                         int newlevel = (spaces + 1) / 3;
                         string tap = trimtext;
+                        // remove the - from the beginning if it exists.
                         if (tap.StartsWith("-")) tap = tap.Remove(0, 1);
-                        if (newlevel == 1)
+
+                        // The logic below builds a tree of inventory items.
+                        if (newlevel == 1) // If the item is in the first level, add to the root item list
                         {
                             lastItem = currentData.AddItem(new ItemData() { tap = tap });
                         }
-                        else if (newlevel == level)
+                        else if (newlevel == level) // If this is the same level as the previous item, add to the previous item's parent's item list.
                         {
                             lastItem = lastItem.parent.AddItem(new ItemData() { tap = tap });
                         }
-                        else if (newlevel == level + 1)
+                        else if (newlevel == level + 1) // If this item is down a level from the previous, add it to the previous item's item list.
                         {
                             lastItem = lastItem.AddItem(new ItemData() { tap = tap });
                         }
-                        else
+                        else // Else, if the item is up a level, loop back until you reach the correct level.
                         {
                             for (int i = newlevel; i < level; i++)
                             {
@@ -108,19 +126,21 @@ namespace InventoryView
                 } //end if Inventory
                 else if (ScanMode == "VaultStart")
                 {
+                    // Get the vault book & read it.
                     Match match = Regex.Match(trimtext, @"^You get a.*vault book.*from");
                     if (match.Success || trimtext == "You are already holding that.")
                     {
                         _host.EchoText("Scanning Vault.");
                         _host.SendText("read my vault book");
                     }
-                    else if (trimtext == "Vault Inventory:")
+                    else if (trimtext == "Vault Inventory:") // This text appears at the beginning of the vault list.
                     {
                         ScanMode = "Vault";
                         currentData = new CharacterData() { name = _host.get_Variable("charactername"), source = "Vault" };
                         characterData.Add(currentData);
                         level = 1;
                     }
+                    // If you don't have a vault book or you can't read a vault book, it skips to checking your house.
                     else if (trimtext == "What were you referring to?" || trimtext == "The script that the vault book is written in is unfamiliar to you.  You are unable to read it.")
                     {
                         _host.EchoText("Skipping Vault.");
@@ -130,6 +150,7 @@ namespace InventoryView
                 } //end if VaultStart
                 else if (ScanMode == "Vault")
                 {
+                    // This text indicates the end of the vault inventory list.
                     if (text.StartsWith("The last note in your book indicates that your vault contains"))
                     {
                         ScanMode = "HomeStart";
@@ -138,6 +159,8 @@ namespace InventoryView
                     }
                     else
                     {
+                        // Determine how many levels down an item is based on the number of spaces before it.
+                        // Anything greater than 4 levels down shows up at the same level as its parent.
                         int spaces = text.Length - text.TrimStart().Length;
                         int newlevel = 1;
                         switch (spaces)
@@ -182,7 +205,7 @@ namespace InventoryView
                 } //end if Vault
                 else if (ScanMode == "HomeStart")
                 {
-                    if (trimtext == "The home contains:")
+                    if (trimtext == "The home contains:") // This text appears at the beginning of the home list.
                     {
                         _host.EchoText("Scanning Home.");
                         ScanMode = "Home";
@@ -190,6 +213,7 @@ namespace InventoryView
                         characterData.Add(currentData);
                         level = 1;
                     }
+                    // This text appears if you don't have a home, skips and saves the results.
                     else if (trimtext.StartsWith("Your documentation filed with the Estate Holders"))
                     {
                         _host.EchoText("Skipping Home.");
@@ -200,18 +224,18 @@ namespace InventoryView
                 } //end if HomeStart
                 else if (ScanMode == "Home")
                 {
-                    if (trimtext == ">")
+                    if (trimtext == ">") // There is no text after the home list, so watch for the next >
                     {
                         _host.EchoText("Scan Complete.");
                         ScanMode = null;
                         SaveSettings();
                     }
-                    else if (trimtext.StartsWith("Attached:"))
+                    else if (trimtext.StartsWith("Attached:")) // If the item is attached, it is in/on/under/behind a piece of furniture.
                     {
                         string tap = trimtext.Replace("Attached: ", "");
                         lastItem = (lastItem.parent != null ? lastItem.parent : lastItem ).AddItem(new ItemData() { tap = tap });
                     }
-                    else
+                    else // Otherwise, it is a piece of furniture.
                     {
                         string tap = trimtext.Substring(trimtext.IndexOf(":")+2);
                         lastItem = currentData.AddItem(new ItemData() { tap = tap, storage = true });
@@ -334,7 +358,6 @@ namespace InventoryView
                         XmlSerializer serializer = new XmlSerializer(typeof(List<CharacterData>));
                         characterData = (List<CharacterData>)serializer.Deserialize(stream);
                     }
-
                     foreach (var cData in characterData)
                     {
                         AddParents(cData.items, null);
@@ -352,7 +375,7 @@ namespace InventoryView
             string configFile = Path.Combine(basePath, "Plugins", "InventoryView.xml");
             try
             {
-                
+                // Can't serialize a class with circular references, so I have to remove the parent links first.
                 foreach (var cData in characterData)
                 {
                     RemoveParents(cData.items);
@@ -361,7 +384,8 @@ namespace InventoryView
                 XmlSerializer serializer = new XmlSerializer(typeof(List<CharacterData>));
                 serializer.Serialize(writer, characterData);
                 writer.Close();
-
+                
+                // ..and add them back again afterwards.
                 foreach (var cData in characterData)
                 {
                     AddParents(cData.items, null);

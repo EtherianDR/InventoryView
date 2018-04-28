@@ -29,8 +29,11 @@ namespace InventoryView
         {
             chkCharacters.Items.Clear();
             tv.Nodes.Clear();
+            // Get a distinct character list and load them into the checked list box... which is currently not shown/used.
             var characters = Class1.characterData.Select(tbl => tbl.name).Distinct().ToList();
             characters.Sort();
+
+            // Recursively load all the items into the tree
             foreach (var character in characters)
             {
                 chkCharacters.Items.Add(character, true);
@@ -55,6 +58,7 @@ namespace InventoryView
 
         private void btnSearch_Click(object sender, EventArgs e)
         {
+            // Recursively search the tree.
             if (!string.IsNullOrEmpty(txtSearch.Text))
             {
                 searchMatches.Clear();
@@ -81,13 +85,13 @@ namespace InventoryView
             foreach (TreeNode treeNode in nodes)
             {
                 treeNode.BackColor = Color.White;
-                if (SearchTree(treeNode.Nodes) == true)
+                if (SearchTree(treeNode.Nodes) == true) // Recursively search child items. Expand the node if a child item is expanded.
                 {
                     treeNode.Expand();
                     retValue = true;
                 }
 
-                if (treeNode.Text.Contains(txtSearch.Text))
+                if (treeNode.Text.Contains(txtSearch.Text)) // If the current item is a match, change the color & add it to the matches list.
                 {
                     treeNode.Expand();
                     treeNode.BackColor = Color.Yellow;
@@ -110,6 +114,7 @@ namespace InventoryView
 
         private void btnWiki_Click(object sender, EventArgs e)
         {
+            // Sends the tap of the item to drservice.info which has been building a table linking taps to wiki pages from the Plaza scans.
             if (tv.SelectedNode == null)
                 MessageBox.Show("Select an item to lookup.");
             else
