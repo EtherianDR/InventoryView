@@ -136,7 +136,7 @@ namespace InventoryView
             {
                 currentMatch.BackColor = Color.Yellow;
                 int index = searchMatches.IndexOf(currentMatch) - 1;
-                if (index == -1) index = searchMatches.Count();
+                if (index == -1) index = searchMatches.Count()-1;
                 currentMatch = searchMatches[index];
             }
             currentMatch.EnsureVisible();
@@ -169,6 +169,43 @@ namespace InventoryView
             Class1.LoadSettings();
             Class1._host.EchoText("Inventory reloaded.");
             this.Close();
+        }
+
+        private void copyTapToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Clipboard.SetText(tv.SelectedNode.Text);
+        }
+
+        private void exportBranchToFileToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            List<string> branchText = new List<string>();
+            branchText.Add(tv.SelectedNode.Text);
+            copyBranchText(tv.SelectedNode.Nodes, branchText, 1);
+            Clipboard.SetText(string.Join("\r\n", branchText.ToArray()));
+        }
+
+        private void copyBranchText(TreeNodeCollection nodes, List<string> branchText, int level)
+        {
+            foreach (TreeNode node in nodes)
+            {
+                branchText.Add(new string('\t', level) + node.Text);
+                copyBranchText(node.Nodes, branchText, level+1);
+            }
+        }
+
+        private void tv_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+            {
+                Point p = new Point(e.X, e.Y);
+
+                TreeNode node = tv.GetNodeAt(p);
+                if (node != null)
+                {
+                    tv.SelectedNode = node;
+                    contextMenuStrip1.Show(tv, p);
+                }
+            }
         }
     }
 }

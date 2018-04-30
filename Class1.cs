@@ -115,7 +115,7 @@ namespace InventoryView
                         }
                         else // Else, if the item is up a level, loop back until you reach the correct level.
                         {
-                            for (int i = newlevel; i < level; i++)
+                            for (int i = newlevel; i <= level; i++)
                             {
                                 lastItem = lastItem.parent;
                             }
@@ -140,12 +140,12 @@ namespace InventoryView
                         characterData.Add(currentData);
                         level = 1;
                     }
-                    // If you don't have a vault book or you can't read a vault book, it skips to checking your house.
+                    // If you don't have a vault book or you can't read a vault book, it skips to checking your deed register.
                     else if (trimtext == "What were you referring to?" || trimtext == "The script that the vault book is written in is unfamiliar to you.  You are unable to read it.")
                     {
                         _host.EchoText("Skipping Vault.");
-                        ScanMode = "HomeStart";
-                        _host.SendText("home recall");
+                        ScanMode = "DeedStart";
+                        _host.SendText("get my deed register");
                     }
                 } //end if VaultStart
                 else if (ScanMode == "Vault")
@@ -153,9 +153,9 @@ namespace InventoryView
                     // This text indicates the end of the vault inventory list.
                     if (text.StartsWith("The last note in your book indicates that your vault contains"))
                     {
-                        ScanMode = "HomeStart";
+                        ScanMode = "DeedStart";
                         _host.SendText("stow my vault book");
-                        _host.SendText("home recall");
+                        _host.SendText("get my deed register");
                     }
                     else
                     {
@@ -203,6 +203,45 @@ namespace InventoryView
                         level = newlevel;
                     }
                 } //end if Vault
+                else if (ScanMode == "DeedStart")
+                {
+                    // Get the vault book & read it.
+                    Match match = Regex.Match(trimtext, @"^You get a.*deed register.*from");
+                    if (match.Success || trimtext == "You are already holding that.")
+                    {
+                        _host.EchoText("Scanning Deed Register.");
+                        _host.SendText("turn my deed register to contents");
+                        _host.SendText("read my deed register");
+                    }
+                    else if (trimtext == "Page -- Deed") // This text appears at the beginning of the deed register list.
+                    {
+                        ScanMode = "Deed";
+                        currentData = new CharacterData() { name = _host.get_Variable("charactername"), source = "Deed" };
+                        characterData.Add(currentData);
+                        level = 1;
+                    }
+                    // If you don't have a deed register or it is empty, it skips to checking your house.
+                    else if (trimtext == "What were you referring to?" || trimtext.StartsWith("You haven't stored any deeds in this register."))
+                    {
+                        _host.EchoText("Skipping Deed Register.");
+                        ScanMode = "HomeStart";
+                        _host.SendText("home recall");
+                    }
+                } //end if DeedStart
+                else if (ScanMode == "Deed")
+                {
+                    if (trimtext.StartsWith("Currently stored"))
+                    {
+                        _host.SendText("stow my deed register");
+                        ScanMode = "HomeStart";
+                        _host.SendText("home recall");
+                    }
+                    else
+                    {
+                        string tap = trimtext.Substring(trimtext.IndexOf("--") + 3);
+                        lastItem = currentData.AddItem(new ItemData() { tap = tap, storage = false });
+                    }
+                } //end if Deed
                 else if (ScanMode == "HomeStart")
                 {
                     if (trimtext == "The home contains:") // This text appears at the beginning of the home list.
@@ -217,28 +256,52 @@ namespace InventoryView
                     else if (trimtext.StartsWith("Your documentation filed with the Estate Holders"))
                     {
                         _host.EchoText("Skipping Home.");
-                        _host.EchoText("Scan Complete.");
-                        _host.SendText("#parse InventoryView scan complete");
-                        ScanMode = null;
-                        SaveSettings();
+                        if (_host.get_Variable("guild") == "Trader")
+                        {
+                            ScanMode = "TraderStart";
+                            _host.SendText("get my storage book");
+                        }
+                        else
+                        {
+                            _host.EchoText("Scan Complete.");
+                            _host.SendText("#parse InventoryView scan complete");
+                            ScanMode = null;
+                            SaveSettings();
+                        }
                     }
                     else if (trimtext == "You shouldn't do that while inside of a home.  Step outside if you need to check something.")
                     {
                         _host.EchoText("You cannot check the contents of your home while inside of a home. Step outside and try again.");
-                        _host.EchoText("Scan Complete.");
-                        _host.SendText("#parse InventoryView scan complete");
-                        ScanMode = null;
-                        SaveSettings();
+                        if (_host.get_Variable("guild") == "Trader")
+                        {
+                            ScanMode = "TraderStart";
+                            _host.SendText("get my storage book");
+                        }
+                        else
+                        {
+                            _host.EchoText("Scan Complete.");
+                            _host.SendText("#parse InventoryView scan complete");
+                            ScanMode = null;
+                            SaveSettings();
+                        }
                     }
                 } //end if HomeStart
                 else if (ScanMode == "Home")
                 {
                     if (trimtext == ">") // There is no text after the home list, so watch for the next >
                     {
-                        _host.EchoText("Scan Complete.");
-                        _host.SendText("#parse InventoryView scan complete");
-                        ScanMode = null;
-                        SaveSettings();
+                        if (_host.get_Variable("guild") == "Trader")
+                        {
+                            ScanMode = "TraderStart";
+                            _host.SendText("get my storage book");
+                        }
+                        else
+                        {
+                            _host.EchoText("Scan Complete.");
+                            _host.SendText("#parse InventoryView scan complete");
+                            ScanMode = null;
+                            SaveSettings();
+                        }
                     }
                     else if (trimtext.StartsWith("Attached:")) // If the item is attached, it is in/on/under/behind a piece of furniture.
                     {
@@ -251,6 +314,88 @@ namespace InventoryView
                         lastItem = currentData.AddItem(new ItemData() { tap = tap, storage = true });
                     }
                 } //end if Home
+                else if (ScanMode == "TraderStart")
+                {
+                    // Get the storage book & read it.
+                    Match match = Regex.Match(trimtext, @"^You get a.*storage book.*from");
+                    if (match.Success || trimtext == "You are already holding that.")
+                    {
+                        _host.EchoText("Scanning Trader Storage.");
+                        _host.SendText("read my storage book");
+                    }
+                    else if (trimtext == "in the known realms since 402.") // This text appears at the beginning of the storage book list.
+                    {
+                        ScanMode = "Trader";
+                        currentData = new CharacterData() { name = _host.get_Variable("charactername"), source = "TraderStorage" };
+                        characterData.Add(currentData);
+                        level = 1;
+                    }
+                    // If you don't have a vault book or you can't read a vault book, it skips to checking your house.
+                    else if (trimtext == "What were you referring to?" || trimtext == "The storage book is filled with complex lists of inventory that make little sense to you.")
+                    {
+                        _host.EchoText("Skipping Trader Storage.");
+                        _host.EchoText("Scan Complete.");
+                        _host.SendText("#parse InventoryView scan complete");
+                        ScanMode = null;
+                        SaveSettings();
+                    }
+                } // end if trader start
+                else if (ScanMode == "Trader")
+                {
+                    // This text indicates the end of the vault inventory list.
+                    if (text.StartsWith("A notation at the bottom indicates"))
+                    {
+                        _host.EchoText("Scan Complete.");
+                        _host.SendText("#parse InventoryView scan complete");
+                        ScanMode = null;
+                        SaveSettings();
+                    }
+                    else
+                    {
+                        // Determine how many levels down an item is based on the number of spaces before it.
+                        // Anything greater than 4 levels down shows up at the same level as its parent.
+                        int spaces = text.Length - text.TrimStart().Length;
+                        int newlevel = 1;
+                        switch (spaces)
+                        {
+                            case 4:
+                                newlevel = 1;
+                                break;
+                            case 8:
+                                newlevel = 2;
+                                break;
+                            case 12:
+                                newlevel = 3;
+                                break;
+                           default:
+                                newlevel = 3;
+                                break;
+                        }
+                        string tap = trimtext;
+                        if (tap.StartsWith("-")) tap = tap.Remove(0, 1);
+                        if (newlevel == 1)
+                        {
+                            lastItem = currentData.AddItem(new ItemData() { tap = tap, storage = true });
+                        }
+                        else if (newlevel == level)
+                        {
+                            lastItem = lastItem.parent.AddItem(new ItemData() { tap = tap });
+                        }
+                        else if (newlevel == level + 1)
+                        {
+                            lastItem = lastItem.AddItem(new ItemData() { tap = tap });
+                        }
+                        else
+                        {
+                            for (int i = newlevel; i <= level; i++)
+                            {
+                                lastItem = lastItem.parent;
+                            }
+                            lastItem = lastItem.AddItem(new ItemData() { tap = tap });
+                        }
+                        level = newlevel;
+                    }
+                } //end if Trader
             }
 
             return text;
@@ -336,7 +481,7 @@ namespace InventoryView
 
         public string Version
         {
-            get { return "1.0"; }
+            get { return "1.1"; }
         }
 
         public string Description

@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.tv = new System.Windows.Forms.TreeView();
             this.txtSearch = new System.Windows.Forms.TextBox();
             this.chkCharacters = new System.Windows.Forms.CheckedListBox();
@@ -41,6 +42,10 @@
             this.btnFindPrev = new System.Windows.Forms.Button();
             this.btnScan = new System.Windows.Forms.Button();
             this.btnReload = new System.Windows.Forms.Button();
+            this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.copyTapToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.exportBranchToFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.contextMenuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // tv
@@ -52,6 +57,7 @@
             this.tv.Name = "tv";
             this.tv.Size = new System.Drawing.Size(1033, 404);
             this.tv.TabIndex = 10;
+            this.tv.MouseUp += new System.Windows.Forms.MouseEventHandler(this.tv_MouseUp);
             // 
             // txtSearch
             // 
@@ -172,6 +178,28 @@
             this.btnReload.UseVisualStyleBackColor = true;
             this.btnReload.Click += new System.EventHandler(this.btnReload_Click);
             // 
+            // contextMenuStrip1
+            // 
+            this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.copyTapToolStripMenuItem,
+            this.exportBranchToFileToolStripMenuItem});
+            this.contextMenuStrip1.Name = "contextMenuStrip1";
+            this.contextMenuStrip1.Size = new System.Drawing.Size(143, 48);
+            // 
+            // copyTapToolStripMenuItem
+            // 
+            this.copyTapToolStripMenuItem.Name = "copyTapToolStripMenuItem";
+            this.copyTapToolStripMenuItem.Size = new System.Drawing.Size(142, 22);
+            this.copyTapToolStripMenuItem.Text = "Copy Text";
+            this.copyTapToolStripMenuItem.Click += new System.EventHandler(this.copyTapToolStripMenuItem_Click);
+            // 
+            // exportBranchToFileToolStripMenuItem
+            // 
+            this.exportBranchToFileToolStripMenuItem.Name = "exportBranchToFileToolStripMenuItem";
+            this.exportBranchToFileToolStripMenuItem.Size = new System.Drawing.Size(142, 22);
+            this.exportBranchToFileToolStripMenuItem.Text = "Copy Branch";
+            this.exportBranchToFileToolStripMenuItem.Click += new System.EventHandler(this.exportBranchToFileToolStripMenuItem_Click);
+            // 
             // InventoryViewForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -193,6 +221,7 @@
             this.Name = "InventoryViewForm";
             this.Text = "Inventory View";
             this.Load += new System.EventHandler(this.InventoryViewForm_Load);
+            this.contextMenuStrip1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -213,5 +242,8 @@
         private System.Windows.Forms.Button btnFindPrev;
         private System.Windows.Forms.Button btnScan;
         private System.Windows.Forms.Button btnReload;
+        private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
+        private System.Windows.Forms.ToolStripMenuItem copyTapToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem exportBranchToFileToolStripMenuItem;
     }
 }
