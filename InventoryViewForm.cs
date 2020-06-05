@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -206,6 +207,69 @@ namespace InventoryView
                     contextMenuStrip1.Show(tv, p);
                 }
             }
+        }
+
+        private void btnExport_Click(object sender, EventArgs e)
+        {
+            SaveFileDialog saveFileDialog1 = new SaveFileDialog();
+            saveFileDialog1.Filter = "CSV file|*.csv";
+            saveFileDialog1.Title = "Save the CSV file";
+            saveFileDialog1.ShowDialog();
+
+            if (saveFileDialog1.FileName != "")
+            {
+                using (StreamWriter sw = File.CreateText(saveFileDialog1.FileName))
+                {
+                    List<ExportData> list = new List<ExportData>();
+                    exportBranch(tv.Nodes, list, 1);
+                    sw.WriteLine("Character,Tap,Path");
+                    foreach (ExportData item in list)
+                    {
+                        if (item.Path.Count < 2) { } // Skip
+                        else if (item.Path.Count == 3 && new string[] { "Vault", "Home" }.Contains(item.Path[1])) { } // Skip
+                        else
+                        {
+                            sw.WriteLine(string.Format("{0},{1},{2}", CleanCSV(item.Character), CleanCSV(item.Tap), CleanCSV(string.Join("\\", item.Path))));
+                        }
+                    }
+                }
+                MessageBox.Show("Export Complete.");
+            }
+        }
+
+        private string CleanCSV(string data)
+        {
+            if (!data.Contains(","))
+                return data;
+            else if (!data.Contains("\""))
+                return string.Format("\"{0}\"", data);
+            else
+                return string.Format("\"{0}\"", data.Replace("\"","\"\""));
+        }
+
+        private void exportBranch(TreeNodeCollection nodes, List<ExportData> list, int level)
+        {
+            foreach (TreeNode node in nodes)
+            {
+                ExportData exportData = new ExportData() { Tap = node.Text };
+                TreeNode tmpNode = node;
+                while (tmpNode.Parent != null)
+                {
+                    tmpNode = tmpNode.Parent;
+                    if (tmpNode.Parent != null)
+                        exportData.Path.Insert(0, tmpNode.Text);
+                }
+                exportData.Character = tmpNode.Text;
+                list.Add(exportData);
+                exportBranch(node.Nodes, list, level + 1);
+            }
+        }
+
+        public class ExportData
+        {
+            public string Character { get; set; }
+            public string Tap { get; set; }
+            public List<string> Path { get; set; } = new List<string>();
         }
     }
 }

@@ -41,9 +41,7 @@ namespace InventoryView
         {
             _host = host;
 
-            // Figure out if we are using the config in %appdata% or in the Genie directory.
-            if (!Directory.Exists(Path.Combine(basePath, "Config")))
-                basePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), Application.ProductName);
+            basePath = _host.get_Variable("PluginPath");
 
             // Load inventory from the XML config if available.
             LoadSettings();
@@ -84,7 +82,7 @@ namespace InventoryView
                     if (text.StartsWith("Roundtime:")) // text that appears at the end of "inventory list"
                     {
                         // Inventory List has a RT based on the number of items, so grab the number and pause the thread for that length.
-                        Match match = Regex.Match(trimtext, @"^Roundtime:\s{1,3}(\d{1,3})\s{1,3}secs?$");
+                        Match match = Regex.Match(trimtext, @"^Roundtime:\s{1,3}(\d{1,3})\s{1,3}secs?\.$");
                         ScanMode = "VaultStart";
                         _host.EchoText(string.Format("Pausing {0} seconds for RT.", int.Parse(match.Groups[1].Value)));
                         System.Threading.Thread.Sleep(int.Parse(match.Groups[1].Value) * 1000);
@@ -141,7 +139,7 @@ namespace InventoryView
                         level = 1;
                     }
                     // If you don't have a vault book or you can't read a vault book, it skips to checking your deed register.
-                    else if (trimtext == "What were you referring to?" || trimtext == "The script that the vault book is written in is unfamiliar to you.  You are unable to read it.")
+                    else if (trimtext == "What were you referring to?" || trimtext == "The script that the vault book is written in is unfamiliar to you.  You are unable to read it." || trimtext == "The vault book is filled with blank pages pre-printed with branch office letterhead.  An advertisement touting the services of Rundmolen Bros. Storage Co. is pasted on the inside cover.")
                     {
                         _host.EchoText("Skipping Vault.");
                         ScanMode = "DeedStart";
@@ -481,7 +479,7 @@ namespace InventoryView
 
         public string Version
         {
-            get { return "1.1"; }
+            get { return "1.4"; }
         }
 
         public string Description
@@ -503,7 +501,7 @@ namespace InventoryView
 
         public static void LoadSettings()
         {
-            string configFile = Path.Combine(basePath, "Plugins", "InventoryView.xml");
+            string configFile = Path.Combine(basePath, "InventoryView.xml");
             if (File.Exists(configFile))
             {
                 try
@@ -527,7 +525,7 @@ namespace InventoryView
 
         public static void SaveSettings()
         {
-            string configFile = Path.Combine(basePath, "Plugins", "InventoryView.xml");
+            string configFile = Path.Combine(basePath, "InventoryView.xml");
             try
             {
                 // Can't serialize a class with circular references, so I have to remove the parent links first.

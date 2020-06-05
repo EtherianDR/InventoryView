@@ -45,6 +45,7 @@
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.copyTapToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exportBranchToFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.btnExport = new System.Windows.Forms.Button();
             this.contextMenuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -63,7 +64,7 @@
             // 
             this.txtSearch.Location = new System.Drawing.Point(62, 18);
             this.txtSearch.Name = "txtSearch";
-            this.txtSearch.Size = new System.Drawing.Size(365, 20);
+            this.txtSearch.Size = new System.Drawing.Size(262, 20);
             this.txtSearch.TabIndex = 1;
             // 
             // chkCharacters
@@ -87,7 +88,7 @@
             // 
             // btnSearch
             // 
-            this.btnSearch.Location = new System.Drawing.Point(433, 16);
+            this.btnSearch.Location = new System.Drawing.Point(353, 16);
             this.btnSearch.Name = "btnSearch";
             this.btnSearch.Size = new System.Drawing.Size(75, 23);
             this.btnSearch.TabIndex = 2;
@@ -97,7 +98,7 @@
             // 
             // btnExpand
             // 
-            this.btnExpand.Location = new System.Drawing.Point(676, 5);
+            this.btnExpand.Location = new System.Drawing.Point(596, 5);
             this.btnExpand.Name = "btnExpand";
             this.btnExpand.Size = new System.Drawing.Size(75, 23);
             this.btnExpand.TabIndex = 6;
@@ -107,7 +108,7 @@
             // 
             // btnCollapse
             // 
-            this.btnCollapse.Location = new System.Drawing.Point(676, 27);
+            this.btnCollapse.Location = new System.Drawing.Point(596, 27);
             this.btnCollapse.Name = "btnCollapse";
             this.btnCollapse.Size = new System.Drawing.Size(75, 23);
             this.btnCollapse.TabIndex = 7;
@@ -117,7 +118,7 @@
             // 
             // btnWiki
             // 
-            this.btnWiki.Location = new System.Drawing.Point(757, 16);
+            this.btnWiki.Location = new System.Drawing.Point(677, 16);
             this.btnWiki.Name = "btnWiki";
             this.btnWiki.Size = new System.Drawing.Size(75, 23);
             this.btnWiki.TabIndex = 8;
@@ -127,7 +128,7 @@
             // 
             // btnReset
             // 
-            this.btnReset.Location = new System.Drawing.Point(595, 16);
+            this.btnReset.Location = new System.Drawing.Point(515, 16);
             this.btnReset.Name = "btnReset";
             this.btnReset.Size = new System.Drawing.Size(75, 23);
             this.btnReset.TabIndex = 5;
@@ -138,7 +139,7 @@
             // 
             // btnFindNext
             // 
-            this.btnFindNext.Location = new System.Drawing.Point(514, 27);
+            this.btnFindNext.Location = new System.Drawing.Point(434, 27);
             this.btnFindNext.Name = "btnFindNext";
             this.btnFindNext.Size = new System.Drawing.Size(75, 23);
             this.btnFindNext.TabIndex = 4;
@@ -149,7 +150,7 @@
             // 
             // btnFindPrev
             // 
-            this.btnFindPrev.Location = new System.Drawing.Point(514, 5);
+            this.btnFindPrev.Location = new System.Drawing.Point(434, 5);
             this.btnFindPrev.Name = "btnFindPrev";
             this.btnFindPrev.Size = new System.Drawing.Size(75, 23);
             this.btnFindPrev.TabIndex = 3;
@@ -200,11 +201,22 @@
             this.exportBranchToFileToolStripMenuItem.Text = "Copy Branch";
             this.exportBranchToFileToolStripMenuItem.Click += new System.EventHandler(this.exportBranchToFileToolStripMenuItem_Click);
             // 
+            // btnExport
+            // 
+            this.btnExport.Location = new System.Drawing.Point(758, 16);
+            this.btnExport.Name = "btnExport";
+            this.btnExport.Size = new System.Drawing.Size(75, 23);
+            this.btnExport.TabIndex = 13;
+            this.btnExport.Text = "Export";
+            this.btnExport.UseVisualStyleBackColor = true;
+            this.btnExport.Click += new System.EventHandler(this.btnExport_Click);
+            // 
             // InventoryViewForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1057, 471);
+            this.Controls.Add(this.btnExport);
             this.Controls.Add(this.btnReload);
             this.Controls.Add(this.btnScan);
             this.Controls.Add(this.btnFindNext);
@@ -245,5 +257,6 @@
         private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
         private System.Windows.Forms.ToolStripMenuItem copyTapToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem exportBranchToFileToolStripMenuItem;
+        private System.Windows.Forms.Button btnExport;
     }
 }
