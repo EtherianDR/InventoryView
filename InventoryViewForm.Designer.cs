@@ -56,6 +56,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tv.Location = new System.Drawing.Point(12, 55);
             this.tv.Name = "tv";
+            this.tv.ShowNodeToolTips = true;
             this.tv.Size = new System.Drawing.Size(1033, 404);
             this.tv.TabIndex = 10;
             this.tv.MouseUp += new System.Windows.Forms.MouseEventHandler(this.tv_MouseUp);
@@ -213,6 +214,7 @@
             // 
             // InventoryViewForm
             // 
+            this.AcceptButton = this.btnSearch;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1057, 471);

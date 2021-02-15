@@ -42,6 +42,7 @@ namespace InventoryView
                 foreach (var source in Class1.characterData.Where(tbl => tbl.name == character))
                 {
                     TreeNode sourceNode = charNode.Nodes.Add(source.source);
+                    sourceNode.ToolTipText = sourceNode.FullPath;
                     PopulateTree(sourceNode, source.items);
                 }
             }
@@ -52,6 +53,7 @@ namespace InventoryView
             foreach (var item in itemList)
             {
                 TreeNode newNode = treeNode.Nodes.Add(item.tap);
+                newNode.ToolTipText = newNode.FullPath;
                 if (item.items.Count() > 0)
                     PopulateTree(newNode, item.items);
             }
@@ -169,7 +171,7 @@ namespace InventoryView
         {
             Class1.LoadSettings();
             Class1._host.EchoText("Inventory reloaded.");
-            this.Close();
+            BindData();
         }
 
         private void copyTapToolStripMenuItem_Click(object sender, EventArgs e)
@@ -225,7 +227,7 @@ namespace InventoryView
                     sw.WriteLine("Character,Tap,Path");
                     foreach (ExportData item in list)
                     {
-                        if (item.Path.Count < 2) { } // Skip
+                        if (item.Path.Count < 1) { } // Skip
                         else if (item.Path.Count == 3 && new string[] { "Vault", "Home" }.Contains(item.Path[1])) { } // Skip
                         else
                         {

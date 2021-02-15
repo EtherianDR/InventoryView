@@ -37,6 +37,9 @@ namespace InventoryView
         // The last item tha was scanned.
         private ItemData lastItem = null;
 
+        private bool Debug = false;
+        private string LastText = "";
+
         public void Initialize(IHost host)
         {
             _host = host;
@@ -44,7 +47,7 @@ namespace InventoryView
             basePath = _host.get_Variable("PluginPath");
 
             // Load inventory from the XML config if available.
-            LoadSettings();
+            LoadSettings(initial: true);
         }
 
         public void Show()
@@ -65,7 +68,9 @@ namespace InventoryView
             if (ScanMode != null) // If a scan isn't in progress, do nothing here.
             {
                 string trimtext = text.Trim(new char[] { '\n', '\r', ' ' }); // Trims spaces and newlines.
-                if (string.IsNullOrEmpty(trimtext)) { } // Skip blank lines
+                LastText = trimtext;
+                if (trimtext.StartsWith("XML") && trimtext.EndsWith("XML")) { } // Skip XML parser lines
+                else if (string.IsNullOrEmpty(trimtext)) { } // Skip blank lines
                 else if (ScanMode == "Start") // When a scan is initiated, it starts here.
                 {
                     if (trimtext == "You have:") // Text that appears at the beginning of "inventory list"
@@ -79,7 +84,11 @@ namespace InventoryView
                 } //end if Start
                 else if (ScanMode == "Inventory")
                 {
-                    if (text.StartsWith("Roundtime:")) // text that appears at the end of "inventory list"
+                    if (text.StartsWith("[Use INVENTORY HELP"))
+                    {
+                        // Skip
+                    }
+                    else if (text.StartsWith("Roundtime:")) // text that appears at the end of "inventory list"
                     {
                         // Inventory List has a RT based on the number of items, so grab the number and pause the thread for that length.
                         Match match = Regex.Match(trimtext, @"^Roundtime:\s{1,3}(\d{1,3})\s{1,3}secs?\.$");
@@ -261,9 +270,9 @@ namespace InventoryView
                         }
                         else
                         {
+                            ScanMode = null;
                             _host.EchoText("Scan Complete.");
                             _host.SendText("#parse InventoryView scan complete");
-                            ScanMode = null;
                             SaveSettings();
                         }
                     }
@@ -277,9 +286,9 @@ namespace InventoryView
                         }
                         else
                         {
+                            ScanMode = null;
                             _host.EchoText("Scan Complete.");
                             _host.SendText("#parse InventoryView scan complete");
-                            ScanMode = null;
                             SaveSettings();
                         }
                     }
@@ -295,9 +304,9 @@ namespace InventoryView
                         }
                         else
                         {
+                            ScanMode = null;
                             _host.EchoText("Scan Complete.");
                             _host.SendText("#parse InventoryView scan complete");
-                            ScanMode = null;
                             SaveSettings();
                         }
                     }
@@ -331,10 +340,10 @@ namespace InventoryView
                     // If you don't have a vault book or you can't read a vault book, it skips to checking your house.
                     else if (trimtext == "What were you referring to?" || trimtext == "The storage book is filled with complex lists of inventory that make little sense to you.")
                     {
+                        ScanMode = null;
                         _host.EchoText("Skipping Trader Storage.");
                         _host.EchoText("Scan Complete.");
                         _host.SendText("#parse InventoryView scan complete");
-                        ScanMode = null;
                         SaveSettings();
                     }
                 } // end if trader start
@@ -343,9 +352,9 @@ namespace InventoryView
                     // This text indicates the end of the vault inventory list.
                     if (text.StartsWith("A notation at the bottom indicates"))
                     {
+                        ScanMode = null;
                         _host.EchoText("Scan Complete.");
                         _host.SendText("#parse InventoryView scan complete");
-                        ScanMode = null;
                         SaveSettings();
                     }
                     else
@@ -401,7 +410,7 @@ namespace InventoryView
 
         public string ParseInput(string text)
         {
-            if (text.ToLower().StartsWith("/inventoryview") || text.ToLower().StartsWith("/iv"))
+            if (text.ToLower().StartsWith("/inventoryview ") || text.ToLower().StartsWith("/iv "))
             {
                 var SplitText = text.Split(' ');
                 if (SplitText.Length == 1 || SplitText[1].ToLower() == "help")
@@ -428,6 +437,16 @@ namespace InventoryView
                 else if (SplitText[1].ToLower() == "open")
                 {
                     Show();
+                }
+                else if (SplitText[1].ToLower() == "debug")
+                {
+                    Debug = !Debug;
+                    _host.EchoText("InventoryView Debug Mode " + (Debug ? "ON" : "OFF"));
+                }
+                else if (SplitText[1].ToLower() == "lasttext")
+                {
+                    Debug = !Debug;
+                    _host.EchoText("InventoryView Debug Last Text: " + LastText);
                 }
                 else
                     Help();
@@ -479,7 +498,7 @@ namespace InventoryView
 
         public string Version
         {
-            get { return "1.4"; }
+            get { return "1.6"; }
         }
 
         public string Description
@@ -499,7 +518,7 @@ namespace InventoryView
             set { _enabled = value; }
         }
 
-        public static void LoadSettings()
+        public static void LoadSettings(bool initial = false)
         {
             string configFile = Path.Combine(basePath, "InventoryView.xml");
             if (File.Exists(configFile))
@@ -515,6 +534,8 @@ namespace InventoryView
                     {
                         AddParents(cData.items, null);
                     }
+                    if (!initial)
+                        _host.EchoText("InventoryView data loaded.");
                 }
                 catch (IOException ex)
                 {
