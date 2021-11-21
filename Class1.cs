@@ -170,21 +170,23 @@ namespace InventoryView
                         // Anything greater than 4 levels down shows up at the same level as its parent.
                         int spaces = text.Length - text.TrimStart().Length;
                         int newlevel = 1;
-                        switch (spaces)
-                        {
-                            case 4:
-                                newlevel = 1;
-                                break;
-                            case 8:
-                                newlevel = 2;
-                                break;
-                            case 12:
-                                newlevel = 3;
-                                break;
-                            case 15:
-                                newlevel = 4;
-                                break;
-                        }
+                        if (spaces > 4)
+                            newlevel += (spaces - 4) / 2;
+                        //switch (spaces)
+                        //{
+                        //    case 4:
+                        //        newlevel = 1;
+                        //        break;
+                        //    case 6:
+                        //        newlevel = 2;
+                        //        break;
+                        //    case 8:
+                        //        newlevel = 3;
+                        //        break;
+                        //    case 10:
+                        //        newlevel = 4;
+                        //        break;
+                        //}
                         string tap = trimtext;
                         if (tap.StartsWith("-")) tap = tap.Remove(0, 1);
                         if (newlevel == 1)
@@ -498,7 +500,7 @@ namespace InventoryView
 
         public string Version
         {
-            get { return "1.6"; }
+            get { return "1.7"; }
         }
 
         public string Description
