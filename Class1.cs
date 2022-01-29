@@ -500,7 +500,7 @@ namespace InventoryView
 
         public string Version
         {
-            get { return "1.7"; }
+            get { return "1.8"; }
         }
 
         public string Description
