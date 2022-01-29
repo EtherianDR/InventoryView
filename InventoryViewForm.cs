@@ -121,7 +121,17 @@ namespace InventoryView
             if (tv.SelectedNode == null)
                 MessageBox.Show("Select an item to lookup.");
             else
-                System.Diagnostics.Process.Start(string.Format("https://drservice.info/wiki.ashx?tap={0}", tv.SelectedNode.Text.Replace(" (closed)", "")));
+            {
+                Class1._host.EchoText(Class1._host.InterfaceVersion.ToString());
+                if(Class1._host.InterfaceVersion == 4)
+                {
+                    Class1._host.SendText(string.Format("#browser https://drservice.info/wiki.ashx?tap={0}", tv.SelectedNode.Text.Replace(" (closed)", "")));
+                }
+                else
+                {
+                    System.Diagnostics.Process.Start(string.Format("https://drservice.info/wiki.ashx?tap={0}", tv.SelectedNode.Text.Replace(" (closed)", "")));
+                }
+            }
         }
 
         private void btnReset_Click(object sender, EventArgs e)
